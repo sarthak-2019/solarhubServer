@@ -4,5 +4,6 @@ const postController = require("./../Controller/postController");
 router.get("/latestTopics", postController.getLatestTopics);
 router.get("/allPostforTopics", postController.getLatestPost);
 router.post("/createTopic", postController.createTopic);
+router.post("/createPostforTopic", postController.createPost);
 
 module.exports = router;
