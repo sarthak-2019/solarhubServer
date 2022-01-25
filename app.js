@@ -11,4 +11,5 @@ app.use(cors());
 app.use(bodyParser.json({ limit: "30mb", extended: true }));
 app.use("/SolarHub-Discourse/user", require("./Routers/userRouter"));
 app.use("/SolarHub-Discourse/post", require("./Routers/postRouter"));
+app.use("/SolarHub-Discourse/stats", require("./Routers/generalStats"));
 module.exports = app;
