@@ -35,3 +35,21 @@ exports.getLatestStats = async (req, res) => {
     res.status(500).json({ message: "Something went wrong" });
   }
 };
+
+exports.getTopContributors = async (req, res) => {
+  try {
+    let data = [];
+    const citiesRef = db.collection("discourse_top_contributors");
+    const snapshot = await citiesRef.get();
+    snapshot.forEach((doc) => {
+      data.push(doc.data());
+    });
+    data.sort(function (a, b) {
+      return b.count - a.count;
+    });
+    res.status(201).json({ data });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Something went wrong" });
+  }
+};
