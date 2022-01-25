@@ -7,17 +7,4 @@ admin.initializeApp({
 
 const db = admin.firestore();
 
-const fetchCities = () => {
-  db.collection("users")
-    .doc("SF")
-    .get()
-    .then(async (docRef) => {
-      const city = await docRef.data();
-      console.log("CITY: ", city);
-    })
-    .catch((e) => {
-      console.error("something went wrong", e);
-    });
-};
-
-fetchCities();
+module.exports = db;
