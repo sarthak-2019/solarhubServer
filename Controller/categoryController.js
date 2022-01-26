@@ -24,7 +24,6 @@ exports.getAllCategories = async (req, res) => {
     res.status(500).json({ message: "Something went wrong" });
   }
 };
-
 exports.getAllCategoriesData = async (req, res) => {
   try {
     const response1 = await axios.get(
@@ -58,6 +57,18 @@ exports.getAllCategoriesData = async (req, res) => {
         }
       );
       let temp1 = [];
+      let temp3 = [];
+      for (
+        let i = 0;
+        i < Math.min(3, response2.data.topic_list.topics.length);
+        i++
+      ) {
+        let temp4 = {};
+        temp4.id = response2.data.topic_list.topics[i].id;
+        temp4.title = response2.data.topic_list.topics[i].title;
+        temp4.created_at = response2.data.topic_list.topics[i].created_at;
+        temp3.push(temp4);
+      }
       for (let j = 0; j < response2.data.users.length; j++) {
         let temp2 = {};
         temp2.user_id = response2.data.users[j].id;
@@ -67,6 +78,7 @@ exports.getAllCategoriesData = async (req, res) => {
         temp1.push(temp2);
       }
       data[i].users = temp1;
+      data[i].latest_topics = temp3;
     }
     res.status(201).json({ Categories: data });
   } catch (error) {
