@@ -1,6 +1,10 @@
 const db = require("./../firebase");
 exports.sendInvitation = async (req, res) => {
   const { sender_uid, receiver_uid } = req.body;
+  if (!sender_uid || !receiver_uid) {
+    res.status(500).json({ message: "Something went wrong" });
+    return;
+  }
   const senderRef = db.collection("users").doc(sender_uid);
   const doc = await senderRef.get();
   const sender_user = doc.data();
