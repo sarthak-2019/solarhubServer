@@ -81,8 +81,12 @@ exports.acceptInvitation = async (req, res) => {
       pending_invitaion.push(receiver_user?.pending_invitaion[i]);
     }
   }
-  accepted_invitation_sender.push(receiver_uid);
-  accepted_invitation_receiver.push(sender_uid);
+  if (!accepted_invitation_sender.includes(receiver_uid)) {
+    accepted_invitation_sender.push(receiver_uid);
+  }
+  if (!accepted_invitation_receiver.includes(sender_uid)) {
+    accepted_invitation_receiver.push(sender_uid);
+  }
   try {
     const res2 = await senderRef.update({
       accepted_invitaion: accepted_invitation_sender,
