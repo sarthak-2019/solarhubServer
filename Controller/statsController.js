@@ -39,11 +39,33 @@ exports.getLatestStats = async (req, res) => {
 exports.getTopContributors = async (req, res) => {
   try {
     let data = [];
-    const citiesRef = db.collection("discourse_top_contributors");
-    const snapshot = await citiesRef.get();
-    snapshot.forEach((doc) => {
-      data.push(doc.data());
-    });
+    for (let i = 0; i < 1000; i++) {
+      const response = await axios.get(
+        `${process.env.DISCOURSE_URL}/directory_items.json?period=all&page=${i}`,
+        {
+          headers: {
+            "Api-Key": process.env.DISCOURSE_API_KEY,
+            "Api-Username": process.env.DISCOURSE_ADMIN_USERNAME,
+          },
+        }
+      );
+      if (response.data.directory_items.length === 0) {
+        break;
+      } else {
+        for (let j = 0; j < response.data.directory_items.length; j++) {
+          let temp = {};
+          temp.count =
+            response.data.directory_items[j].topic_count +
+            response.data.directory_items[j].post_count;
+          temp.user_id = response.data.directory_items[j].id;
+          temp.username = response.data.directory_items[j].user.username;
+          temp.name = response.data.directory_items[j].user.name;
+          temp.avatar_template = `${process.env.DISCOURSE_URL}${response.data.directory_items[j].user.avatar_template}`;
+          data.push(temp);
+        }
+      }
+    }
+
     data.sort(function (a, b) {
       return b.count - a.count;
     });
