@@ -44,6 +44,7 @@ exports.getAllCategoriesData = async (req, res) => {
       temp.category_slug = response1.data.category_list.categories[i].slug;
       temp.topic_count = response1.data.category_list.categories[i].topic_count;
       temp.post_count = response1.data.category_list.categories[i].post_count;
+      temp.description = response1.data.category_list.categories[i].description;
       data.push(temp);
     }
     for (let i = 0; i < data.length; i++) {
