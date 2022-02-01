@@ -1,6 +1,7 @@
 const db = require("./../firebase");
 exports.sendInvitation = async (req, res) => {
-  const { sender_uid, receiver_uid } = req.body;
+  const { sender_uid, receiver_uid, avalabilty } = req.body;
+  console.log(avalabilty);
   if (!sender_uid || !receiver_uid) {
     res.status(500).json({ message: "Something went wrong" });
     return;
@@ -21,19 +22,23 @@ exports.sendInvitation = async (req, res) => {
     pending_invitaion = [...receiver_user?.pending_invitaion];
   }
   if (!waiting_invitaion.includes(receiver_uid)) {
-    waiting_invitaion.push(receiver_uid);
+    waiting_invitaion.push({
+      receiver_uid,
+      avalabilty,
+    });
   } else {
     res.status(201).json({ data: sender_user });
     return;
   }
   if (!pending_invitaion.includes(sender_uid)) {
-    pending_invitaion.push(sender_uid);
+    pending_invitaion.push({
+      sender_uid,
+      avalabilty,
+    });
   } else {
     res.status(201).json({ data: sender_user });
     return;
   }
-  console.log(waiting_invitaion);
-  console.log(pending_invitaion);
   try {
     const res2 = await senderRef.update({
       waiting_invitaion: waiting_invitaion,

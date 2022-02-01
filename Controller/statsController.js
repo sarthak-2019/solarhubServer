@@ -13,13 +13,13 @@ exports.getLatestStats = async (req, res) => {
     );
     const noUsers = response.data.length;
     const response1 = await axios.get(
-      `${process.env.DISCOURSE_URL}/categories.json`,
-      {
-        headers: {
-          "Api-Key": process.env.DISCOURSE_API_KEY,
-          "Api-Username": process.env.DISCOURSE_ADMIN_USERNAME,
-        },
-      }
+      `${process.env.DISCOURSE_URL}/categories.json`
+      // {
+      //   headers: {
+      //     "Api-Key": process.env.DISCOURSE_API_KEY,
+      //     "Api-Username": process.env.DISCOURSE_ADMIN_USERNAME,
+      //   },
+      // }
     );
     let topics = 0;
     let post = 0;
@@ -41,13 +41,13 @@ exports.getTopContributors = async (req, res) => {
     let data = [];
     for (let i = 0; i < 1000; i++) {
       const response = await axios.get(
-        `${process.env.DISCOURSE_URL}/directory_items.json?period=all&page=${i}`,
-        {
-          headers: {
-            "Api-Key": process.env.DISCOURSE_API_KEY,
-            "Api-Username": process.env.DISCOURSE_ADMIN_USERNAME,
-          },
-        }
+        `${process.env.DISCOURSE_URL}/directory_items.json?period=all&page=${i}`
+        // {
+        //   headers: {
+        //     "Api-Key": process.env.DISCOURSE_API_KEY,
+        //     "Api-Username": process.env.DISCOURSE_ADMIN_USERNAME,
+        //   },
+        // }
       );
       if (response.data.directory_items.length === 0) {
         break;
