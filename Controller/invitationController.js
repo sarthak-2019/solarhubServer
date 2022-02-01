@@ -1,8 +1,11 @@
 const db = require("./../firebase");
 const sendEmail = require("./../utils/sendEmail");
 exports.sendInvitation = async (req, res) => {
-  const { sender_uid, receiver_uid, avalabilty } = req.body;
-  console.log(avalabilty);
+  let avalabilty = [];
+  const { sender_uid, receiver_uid } = req.body;
+  if (req.body.avalabilty) {
+    avalabilty = req.body.avalabilty;
+  }
   if (!sender_uid || !receiver_uid) {
     res.status(500).json({ message: "Something went wrong" });
     return;
@@ -60,7 +63,7 @@ exports.sendInvitation = async (req, res) => {
       pending_invitaion: pending_invitaion,
     });
     const doc3 = await senderRef.get();
-    sendEmail(sender_user.email);
+    sendEmail(receiver_user.email, sender_user.fullName);
     res.status(201).json({ data: doc3.data() });
   } catch (error) {
     console.log(error);
