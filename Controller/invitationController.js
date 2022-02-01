@@ -1,4 +1,5 @@
 const db = require("./../firebase");
+const sendEmail = require("./../utils/sendEmail");
 exports.sendInvitation = async (req, res) => {
   const { sender_uid, receiver_uid, avalabilty } = req.body;
   console.log(avalabilty);
@@ -21,7 +22,13 @@ exports.sendInvitation = async (req, res) => {
   if ("pending_invitaion" in receiver_user) {
     pending_invitaion = [...receiver_user?.pending_invitaion];
   }
-  if (!waiting_invitaion.includes(receiver_uid)) {
+  let f = 1;
+  for (let i = 0; i < waiting_invitaion.length; i++) {
+    if (waiting_invitaion[i].receiver_uid === receiver_uid) {
+      f = 0;
+    }
+  }
+  if (f) {
     waiting_invitaion.push({
       receiver_uid,
       avalabilty,
@@ -30,7 +37,13 @@ exports.sendInvitation = async (req, res) => {
     res.status(201).json({ data: sender_user });
     return;
   }
-  if (!pending_invitaion.includes(sender_uid)) {
+  f = 1;
+  for (let i = 0; i < pending_invitaion.length; i++) {
+    if (pending_invitaion[i].sender_uid === sender_uid) {
+      f = 0;
+    }
+  }
+  if (f) {
     pending_invitaion.push({
       sender_uid,
       avalabilty,
@@ -47,6 +60,7 @@ exports.sendInvitation = async (req, res) => {
       pending_invitaion: pending_invitaion,
     });
     const doc3 = await senderRef.get();
+    sendEmail(sender_user.email);
     res.status(201).json({ data: doc3.data() });
   } catch (error) {
     console.log(error);
