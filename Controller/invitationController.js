@@ -1,14 +1,87 @@
 const db = require("./../firebase");
 const sendEmail = require("./../utils/sendEmail");
-exports.sendInvitation = async (req, res) => {
-  let avalabilty = [];
-  const { sender_uid, receiver_uid } = req.body;
-  if (req.body.avalabilty) {
-    avalabilty = req.body.avalabilty;
+
+const days = [
+  "Sunday",
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+];
+function convertDurationtoSeconds(duration) {
+  const [hours, minutes, seconds] = duration.split(":");
+  return Number(hours) * 60 + Number(minutes);
+}
+
+const returnMinute = (meetDuration) => {
+  if (meetDuration.includes("min")) {
+    const result = meetDuration.substr("min", 2);
+    const newString = `00:${result}:00`;
+    return convertDurationtoSeconds(newString);
   }
+  if (meetDuration.includes("hr")) {
+    const firstMeter = meetDuration.split("hr")[0];
+    if (!meetDuration.includes(":")) {
+      return convertDurationtoSeconds(`${firstMeter}:00:00`);
+    }
+    const secoundMeter = meetDuration.split("hr")[1].split(":")[1];
+    const newString = `${firstMeter}:${secoundMeter}:00`;
+    return convertDurationtoSeconds(newString);
+  }
+};
+exports.sendInvitation = async (req, res) => {
+  console.log(req.body);
+  const { sender_uid, receiver_uid } = req.body;
   if (!sender_uid || !receiver_uid) {
     res.status(500).json({ message: "Something went wrong" });
     return;
+  }
+  let description = "";
+  let avalabilty = {
+    Sunday: [],
+    Monday: [],
+    Tuesday: [],
+    Wednesday: [],
+    Thursday: [],
+    Friday: [],
+    Saturday: [],
+  };
+  let avalabilty_array = {
+    Sunday: [],
+    Monday: [],
+    Tuesday: [],
+    Wednesday: [],
+    Thursday: [],
+    Friday: [],
+    Saturday: [],
+  };
+  let duration = 0;
+  if (req.body.getData) {
+    avalabilty = req.body.getData;
+    duration = returnMinute(req.body.meetDuration);
+  }
+  if (req.body.description) {
+    description = req.body.description;
+  }
+
+  for (let i = 0; i < 7; i++) {
+    for (let j = 0; j < avalabilty[days[i]].length; j++) {
+      let start = convertDurationtoSeconds(avalabilty[days[i]][j].FROM);
+      let end = convertDurationtoSeconds(avalabilty[days[i]][j].TO);
+      avalabilty_array[days[i]] = [];
+      for (let k = start; k < end; k += duration) {
+        let hours = Math.floor(k / 60);
+        let minutes = k - hours * 60;
+        const ampm = hours >= 12 ? "pm" : "am";
+        hours %= 12;
+        hours = hours || 12;
+        minutes = minutes < 10 ? `0${minutes}` : minutes;
+        const strTime = `${hours}:${minutes} ${ampm}`;
+        avalabilty_array[days[i]].push(strTime);
+      }
+    }
   }
   const senderRef = db.collection("users").doc(sender_uid);
   const doc = await senderRef.get();
@@ -34,7 +107,9 @@ exports.sendInvitation = async (req, res) => {
   if (f) {
     waiting_invitaion.push({
       receiver_uid,
-      avalabilty,
+      avalabilty_slots: avalabilty_array,
+      description,
+      duration,
     });
   } else {
     res.status(201).json({ data: sender_user });
@@ -49,12 +124,15 @@ exports.sendInvitation = async (req, res) => {
   if (f) {
     pending_invitaion.push({
       sender_uid,
-      avalabilty,
+      avalabilty_slots: avalabilty_array,
+      description,
+      duration,
     });
   } else {
     res.status(201).json({ data: sender_user });
     return;
   }
+  console.log("duifghruigh");
   try {
     const res2 = await senderRef.update({
       waiting_invitaion: waiting_invitaion,
@@ -63,7 +141,7 @@ exports.sendInvitation = async (req, res) => {
       pending_invitaion: pending_invitaion,
     });
     const doc3 = await senderRef.get();
-    sendEmail(receiver_user.email, sender_user.fullName);
+    // sendEmail(receiver_user.email, sender_user.fullName);
     res.status(201).json({ data: doc3.data() });
   } catch (error) {
     console.log(error);
