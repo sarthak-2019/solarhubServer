@@ -170,6 +170,7 @@ exports.acceptInvitationwithSchedule = async (req, res) => {
     0,
     0
   );
+  console.log(AppointmentDate);
   const { sender_uid, receiver_uid } = req.body;
   if (!sender_uid || !receiver_uid) {
     res.status(500).json({ message: "Something went wrong" });
@@ -222,6 +223,7 @@ exports.acceptInvitationwithSchedule = async (req, res) => {
       meeting_time: AppointmentDate,
       description: req.body.description,
       duration: req.body.duration,
+      is_accepted: false,
     });
   } else {
     res.status(201).json({ data: receiver_user });
@@ -239,6 +241,7 @@ exports.acceptInvitationwithSchedule = async (req, res) => {
       meeting_time: AppointmentDate,
       description: req.body.description,
       duration: req.body.duration,
+      is_accepted: true,
     });
   } else {
     res.status(201).json({ data: receiver_user });
@@ -306,6 +309,7 @@ exports.acceptInvitation = async (req, res) => {
       receiver_uid,
       description: req.body.description,
       duration: 0,
+      is_accepted: false,
     });
   } else {
     res.status(201).json({ data: receiver_user });
@@ -322,6 +326,7 @@ exports.acceptInvitation = async (req, res) => {
       sender_uid,
       description: req.body.description,
       duration: 0,
+      is_accepted: true,
     });
   } else {
     res.status(201).json({ data: receiver_user });
