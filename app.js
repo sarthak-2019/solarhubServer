@@ -17,4 +17,5 @@ app.use(
   "/SolarHub-Discourse/invitation",
   require("./Routers/invitationRouter")
 );
+app.use("/", require("./Routers/authRouter"));
 module.exports = app;
